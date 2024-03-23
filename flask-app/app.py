@@ -11,7 +11,7 @@ def after_request(response):
 
 @app.route('/')
 def hello_world():
-    return 'Hello, Cloud!'
+    return 'Hello, Cloud.'
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
