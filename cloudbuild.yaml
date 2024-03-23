@@ -1,0 +1,5 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:latest', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:latest']
