@@ -26,10 +26,6 @@
       - 'managed'
       - '--allow-unauthenticated' # Use '--no-allow-unauthenticated' if you don't want to allow unauthenticated access
   
-  # Push message to Pub/Sub topics.
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['pubsub', 'topics', 'publish', 'cloud-build-notifications', '--message', 'Build completed']
-
 options:
   # Set logs bucket behavior to create a user-owned logs bucket in the same region as the build project
   logging: CLOUD_LOGGING_ONLY 
