@@ -1,8 +1,38 @@
-steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:latest', '.']
-  dir: 'flask-app'
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:latest']
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['compute', 'instances', 'reset', 'flask-app-instance', '--zone', 'northamerica-northeast1-a']
+  steps:
+  # Build the Docker image using the Docker Cloud Builder.
+  - name: 'gcr.io/cloud-builders/docker'
+    # args: ['build', '-t', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:$COMMIT_SHA', '.']
+    args: ['build', '-t', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:latest', '-t', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:$COMMIT_SHA', '.']
+
+  # Push the image to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:latest']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:$COMMIT_SHA']
+
+  # Deploy the container to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'flask-img'
+      - '--image'
+      - 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:latest'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated' # Use '--no-allow-unauthenticated' if you don't want to allow unauthenticated access
+  
+  # Push message to Pub/Sub topics.
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['pubsub', 'topics', 'publish', 'cloud-build-notifications', '--message', 'Build completed']
+
+options:
+  # Set logs bucket behavior to create a user-owned logs bucket in the same region as the build project
+  logging: CLOUD_LOGGING_ONLY 
+
+images:
+  - 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:latest'
+  - 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:$COMMIT_SHA'
