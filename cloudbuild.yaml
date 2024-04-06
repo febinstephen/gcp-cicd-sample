@@ -3,6 +3,7 @@
   - name: 'gcr.io/cloud-builders/docker'
     # args: ['build', '-t', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:$COMMIT_SHA', '.']
     args: ['build', '-t', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:latest', '-t', 'northamerica-northeast1-docker.pkg.dev/ci-lab-412213/flask-app/flask-img:$COMMIT_SHA', '.']
+    dir: 'flask-app'
 
   # Push the image to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
